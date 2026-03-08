@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+/* Use existing theme from tailwind.config.js */
+@config "./tailwind.config.js";
+
+/* --- CSS Custom Properties --- */
+:root {
+  --color-primary: #FF7A00;
+  --color-accent: #F59E0B;
+  --color-glow: #FBBF24;
+  --color-graphite: #111827;
+  --color-slate: #475569;
+  --color-bg: #F8FAFC;
+}
+
+/* --- Global Styles --- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-graphite);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Smooth transitions for interactive elements site-wide */
+[data-page] a:not([class*="no-transition"]),
+[data-page] button:not([class*="no-transition"]) {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* --- Gradient Text Utilities --- */
+.text-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-primary-animated {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent), var(--color-primary));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* --- Glass Utilities --- */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+/* --- Gradient Backgrounds --- */
+.bg-gradient-mesh {
+  background:
+    conic-gradient(from 180deg at 50% 50%, rgba(255,122,0,0.04) 0deg, rgba(245,158,11,0.02) 120deg, rgba(251,191,36,0.04) 240deg, rgba(255,122,0,0.04) 360deg);
+  background-size: 200% 200%;
+  animation: spotlight 20s ease infinite;
+}
+
+/* --- Gradient Divider --- */
+.gradient-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-primary) 30%, var(--color-accent) 70%, transparent 100%);
+  opacity: 0.4;
+}
+
+/* --- Shimmer Border Utility --- */
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(255,122,0,0.3), rgba(245,158,11,0.1), rgba(255,122,0,0.3));
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* --- Button Shimmer Overlay --- */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: none;
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmer 1.2s ease-in-out;
+}
+
+/* --- Nav Link Underline Animation --- */
+.nav-link-animated {
+  position: relative;
+}
+
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+.nav-link-animated:hover::after {
+  width: 100%;
+}
+
+/* --- Keyframes --- */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(-8px); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 122, 0, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(255, 122, 0, 0.35); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spotlight {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes scroll-infinite {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* --- Animate Utility Classes --- */
+.animate-scroll-infinite {
+  animation: scroll-infinite 25s linear infinite;
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-scroll-infinite {
+    animation: none !important;
+    transform: none !important;
+  }
+}

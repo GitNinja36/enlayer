@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Layers, Twitter, Linkedin, Github } from 'lucide-react';
+import { Twitter, Linkedin, Github } from 'lucide-react';
 import { Container } from '../ui/Container';
+const logoUrl = new URL('../../assets/image3.png', import.meta.url).href;
 
 export const Footer: React.FC = () => {
   return (
@@ -10,19 +11,23 @@ export const Footer: React.FC = () => {
       <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 ">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="space-y-1">
             <Link
               to="/"
               className="flex items-center gap-2.5 transition-opacity duration-200 hover:opacity-90 group"
             >
-              <div className="w-9 h-9 bg-gradient-cta rounded-xl flex items-center justify-center text-white shadow-md shadow-orange-500/20 transition-all duration-300 group-hover:shadow-glow-primary group-hover:scale-105">
-                <Layers size={20} strokeWidth={2.5} />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-graphite font-display">
-                Enlayer
-              </span>
+              <img
+                src={logoUrl}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://res.cloudinary.com/davtv5r1c/image/upload/v1773224431/image_360-removebg-preview-3_yg2row.png';
+                }}
+                alt="Enlayer"
+                className="h-18 md:h-16 w-auto object-contain drop-shadow-sm block"
+                loading="lazy"
+              />
             </Link>
             <p className="text-slate text-sm leading-relaxed max-w-xs">
               The decision and growth layer for modern B2B SaaS teams.

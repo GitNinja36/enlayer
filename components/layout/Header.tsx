@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Layers } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
+
+const logoUrl = new URL('../../assets/image3.png', import.meta.url).href;
 
 interface HeaderProps {
   onOpenDemo: () => void;
@@ -33,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenDemo }) => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${isScrolled
-          ? 'glass-header shadow-glass py-3'
+          ? 'glass-header shadow-glass py-1'
           : 'bg-transparent py-6'
         }`}
     >
@@ -41,10 +43,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenDemo }) => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 z-50 group">
-            <div className="w-9 h-9 bg-gradient-cta rounded-xl flex items-center justify-center text-white shadow-md shadow-orange-500/20 transition-all duration-300 group-hover:shadow-glow-primary group-hover:scale-105">
-              <Layers size={20} strokeWidth={2.5} />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-graphite font-display">Enlayer</span>
+            <img
+              src={logoUrl}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://res.cloudinary.com/davtv5r1c/image/upload/v1773224431/image_360-removebg-preview-3_yg2row.png';
+              }}
+              alt="Enlayer"
+              className="h-18 md:h-16 w-auto object-contain drop-shadow-sm block"
+            />
           </Link>
 
           {/* Desktop Nav */}

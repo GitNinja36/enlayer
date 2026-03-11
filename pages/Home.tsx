@@ -209,7 +209,6 @@ const ProblemTimeline = () => {
       title: '2.5 Weeks',
       subtitle: 'IMPACT DETECTED',
       desc: 'Wasted validating raw data before any work begins.',
-      bottleneck: true
     },
     {
       id: 'alignment',
@@ -260,17 +259,7 @@ const ProblemTimeline = () => {
 
             return (
               <div key={idx} className="relative flex flex-col items-center group w-48">
-                <div className="h-8 mb-2 relative flex justify-center items-end">
-                  {step.bottleneck && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: isActive ? 1 : 0.6, y: 0, scale: isActive ? 1.05 : 1 }}
-                      className="px-2.5 py-0.5 rounded-full bg-orange-50 border border-orange-200 text-primary text-[10px] font-bold uppercase tracking-wider shadow-sm"
-                    >
-                      Bottleneck
-                    </motion.div>
-                  )}
-                </div>
+                <div className="h-8 mb-2 relative flex justify-center items-end" />
 
                 <motion.div
                   className={`w-4 h-4 rounded-full border-2 transition-all duration-300 relative z-10 ${isActive ? 'bg-primary border-primary ring-4 ring-orange-100 scale-110 shadow-md' :
@@ -453,6 +442,8 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
   const [hoveredModule, setHoveredModule] = useState<number | null>(null);
   const [activeOutcomeFilter, setActiveOutcomeFilter] = useState<string | null>(null);
+  const [activeUseCase, setActiveUseCase] = useState<keyof typeof useCaseContent>('Founders');
+  const [selectedPricing, setSelectedPricing] = useState<number | null>(null);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
@@ -1174,29 +1165,70 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
         </Container>
       </Section>
 
-      {/* --- Section 6: Use Cases (Enhanced Vertical Cards) --- */}
-      <Section id="use-cases" background="white" className="bg-gray-50/30">
+      {/* --- Section 6: Use Cases (Tabbed, like enlayer.ai) --- */}
+      <Section id="use-cases" background="white" className="bg-gray-50/30 pt-10 md:pt-14 pb-16 md:pb-20">
         <Container>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.span variants={fadeInUp} className="inline-block text-base font-bold text-primary uppercase tracking-wide mb-4 font-display">Use Cases</motion.span>
-            <motion.h3 variants={fadeInUp} className="text-4xl font-bold text-graphite mb-4 font-display">Built for <span className="text-gradient-primary">every team</span>.</motion.h3>
-            <motion.p variants={fadeInUp} className="text-slate text-lg">Whether you're finding fit or scaling it.</motion.p>
-          </motion.div>
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-40px' }}
+              variants={staggerContainer}
+              className="text-center mb-6"
+            >
+              <motion.span variants={fadeInUp} className="inline-block text-base font-bold text-primary uppercase tracking-wide mb-3 font-display">
+                Use Cases
+              </motion.span>
+              <motion.h3 variants={fadeInUp} className="text-4xl font-bold text-graphite mb-3 font-display">
+                Built for <span className="text-gradient-primary">every team</span>.
+              </motion.h3>
+              <motion.p variants={fadeInUp} className="text-slate text-lg">
+                Whether you're finding fit or scaling it.
+              </motion.p>
+            </motion.div>
+            {/* Persona Tabs */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-20px' }}
+              variants={fadeInUp}
+              className="flex flex-wrap justify-center gap-3 mb-6 px-3 py-2 rounded-full bg-white/70 shadow-sm shadow-orange-100/60 border border-orange-50/80 backdrop-blur-sm"
+            >
+              {(Object.keys(useCaseContent) as (keyof typeof useCaseContent)[]).map((key) => {
+                const content = useCaseContent[key];
+                const isActive = activeUseCase === key;
+                const isOrange = content.color === 'orange';
+                const isBlue = content.color === 'blue';
+                const isGreen = content.color === 'green';
+                const iconBg = isOrange ? 'bg-orange-100 text-orange-600' : isBlue ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600';
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-20px' }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {Object.entries(useCaseContent).map(([key, content], i) => {
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveUseCase(key)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer border
+                      ${
+                        isActive
+                          ? 'bg-gradient-cta text-white shadow-md shadow-orange-200/60 border-transparent ring-2 ring-orange-200'
+                          : 'bg-white/95 border-gray-200 text-slate hover:border-primary/40 hover:text-primary hover:shadow-glow-soft hover:-translate-y-0.5'
+                      }`}
+                  >
+                    <span
+                      className={`w-8 h-8 rounded-2xl flex items-center justify-center text-xs font-bold ${iconBg}`}
+                    >
+                      {key === 'Founders' ? <Target size={18} /> : key === 'Product' ? <Layers size={18} /> : <TrendingUp size={18} />}
+                    </span>
+                    <span className="font-display tracking-tight">{key}</span>
+                  </button>
+                );
+              })}
+            </motion.div>
+
+            {/* Active Persona Panel */}
+            <AnimatePresence mode="wait">
+              {(() => {
+              const content = useCaseContent[activeUseCase];
               const isOrange = content.color === 'orange';
               const isBlue = content.color === 'blue';
               const isGreen = content.color === 'green';
@@ -1204,46 +1236,84 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
               const iconBg = isOrange ? 'bg-orange-100 text-orange-600' : isBlue ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600';
               const shadowColor = isOrange ? 'shadow-orange-100/50' : isBlue ? 'shadow-blue-100/50' : 'shadow-green-100/50';
               const dotColor = isOrange ? 'bg-orange-400' : isBlue ? 'bg-blue-400' : 'bg-green-400';
-              const hoverBorder = isOrange ? 'hover:border-orange-200' : isBlue ? 'hover:border-blue-200' : 'hover:border-green-200';
+                const panelTint = isOrange
+                ? 'from-orange-50/80 via-white to-white'
+                : isBlue
+                  ? 'from-blue-50/80 via-white to-white'
+                  : 'from-emerald-50/80 via-white to-white';
+              const insightTint = isOrange
+                ? 'from-orange-50/80 to-white'
+                : isBlue
+                  ? 'from-blue-50/80 to-white'
+                  : 'from-emerald-50/80 to-white';
 
-              return (
-                <motion.div key={key} variants={fadeInUp} className="h-full" whileHover={{ y: -2, transition: { duration: 0.2 } }}>
+                return (
+                  <motion.div
+                    key={activeUseCase}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-5 items-stretch"
+                  >
+                  {/* Left: Copy + Questions */}
                   <AnimatedCard
                     noHover
-                    className={`flex flex-col h-full relative overflow-visible group/card transition-all duration-300 border border-gray-200/80 bg-white/95 ${hoverBorder} hover:shadow-lg border-l-4 ${accentBorder}`}
+                    className={`relative overflow-visible group/card transition-all duration-300 border border-gray-200/80 bg-gradient-to-br ${panelTint} border-l-4 ${accentBorder}`}
                   >
                     <div className="mb-6 relative z-10">
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-2xl font-bold text-graphite font-display tracking-tight">{key}</h4>
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover/card:scale-110 ${iconBg} ${shadowColor} shadow-md`}>
-                          {key === 'Founders' ? <Target size={24} /> : key === 'Product' ? <Layers size={24} /> : <TrendingUp size={24} />}
+                        <h4 className="text-2xl font-bold text-graphite font-display tracking-tight">{activeUseCase}</h4>
+                        <div
+                          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${iconBg} ${shadowColor} shadow-md`}
+                        >
+                          {activeUseCase === 'Founders' ? <Target size={24} /> : activeUseCase === 'Product' ? <Layers size={24} /> : <TrendingUp size={24} />}
                         </div>
                       </div>
                       <p className="font-medium text-slate text-lg leading-snug min-h-[56px]">{content.copy}</p>
                     </div>
 
-                    <div className="space-y-3 mb-8 flex-grow min-h-0">
-                      <p className="text-xs font-bold text-slate/50 uppercase tracking-wider mb-2">Top Questions</p>
+                    <div className="space-y-3 mb-6 flex-grow min-h-0">
+                      <p className="text-xs font-bold text-slate/50 uppercase tracking-wider mb-2">
+                        Top Questions
+                      </p>
                       {content.list.map((q, idx) => (
-                        <div key={idx} className="flex items-start gap-3 text-sm text-slate group-hover/card:text-graphite transition-colors duration-200">
-                          <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotColor} transition-transform duration-200 group-hover/card:scale-110`} />
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 text-sm text-slate group-hover/card:text-graphite transition-colors duration-200 rounded-2xl px-2 py-1.5 hover:bg-white/70"
+                        >
+                          <div
+                            className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotColor} transition-transform duration-200 group-hover/card:scale-110`}
+                          />
                           {q}
                         </div>
                       ))}
                     </div>
+                  </AnimatedCard>
 
-                    <div className="pt-6 border-t border-gray-100 mt-auto bg-gray-50/50 -mx-6 md:-mx-8 px-6 md:px-8 pb-6 rounded-b-3xl transition-colors duration-300 group-hover/card:bg-white/80">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles size={14} className={isOrange ? 'text-orange-500' : isBlue ? 'text-blue-500' : 'text-green-500'} />
-                        <span className={`text-xs font-bold uppercase ${isOrange ? 'text-orange-600' : isBlue ? 'text-blue-600' : 'text-green-600'}`}>Example Insight</span>
-                      </div>
-                      <p className="text-sm font-medium text-graphite italic leading-relaxed">"{content.output}"</p>
+                  {/* Right: Example Insight */}
+                  <AnimatedCard
+                    noHover
+                    className={`relative overflow-hidden flex flex-col justify-between border border-gray-200/80 bg-gradient-to-b ${insightTint}`}
+                  >
+                    <div className="mb-4">
+                      <p className="text-xs font-bold text-slate/60 uppercase tracking-wider mb-2">
+                        Example Insight
+                      </p>
+                      <p className="text-base font-medium text-graphite italic leading-relaxed">
+                        “{content.output}”
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100/70 text-xs text-slate/70">
+                      <span>Decision-ready output for {activeUseCase}</span>
+                      <Sparkles size={16} className={isOrange ? 'text-orange-500' : isBlue ? 'text-blue-500' : 'text-green-500'} />
                     </div>
                   </AnimatedCard>
                 </motion.div>
               );
-            })}
-          </motion.div>
+            })()}
+            </AnimatePresence>
+          </div>
         </Container>
       </Section>
 
@@ -1317,7 +1387,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                       {out.visual}
                     </div>
                     <div className="p-8 flex-grow">
-                      <h4 className="text-xl font-bold text-graphite mb-3">{out.title}</h4>
+                      <h4 className="text-xl font-bold text-graphite mb-3 font-display">{out.title}</h4>
                       <p className="text-slate mb-6 text-sm leading-relaxed">{out.desc}</p>
                     </div>
                   </Card>
@@ -1375,6 +1445,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
             {pricing.map((p, i) => {
               const price = i === 0 ? '$0' : i === 1 ? '$49' : i === 2 ? '$199' : 'Custom';
               const period = i === 3 ? '' : '/mo';
+              const isSelected = selectedPricing === i;
+              const isDimmed = !isSelected && selectedPricing !== null;
               const features = i === 0
                 ? ['2 Decision reports', 'Basic signals', '1 User']
                 : i === 1
@@ -1387,15 +1459,18 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                 <motion.div
                   key={i}
                   variants={fadeInUp}
-                  className={`group/card h-full transition-all duration-300 ease-out ${p.popular ? 'lg:-mt-2 lg:mb-2' : ''}`}
+                  onClick={() => setSelectedPricing(prev => prev === i ? null : i)}
+                  className={`group/card h-full transition-all duration-300 ease-out cursor-pointer ${p.popular ? 'lg:-mt-2 lg:mb-2' : ''} ${isDimmed ? 'opacity-75 scale-[0.98]' : ''}`}
                   whileHover={{ y: p.popular ? -4 : -2, transition: { duration: 0.25 } }}
                 >
                   <AnimatedCard
                     noHover
                     className={`flex flex-col relative h-full overflow-visible transition-all duration-300 ease-out
-                      ${p.popular
-                        ? 'ring-2 ring-primary/90 shadow-xl shadow-orange-500/10 z-10 bg-white/95 hover:shadow-2xl hover:shadow-orange-500/15 hover:ring-primary'
-                        : 'border border-gray-200/80 bg-white/90 hover:border-orange-200/60 hover:shadow-lg hover:shadow-orange-500/5'
+                      ${isSelected
+                        ? 'ring-2 ring-primary shadow-xl shadow-orange-500/15 scale-[1.02] bg-white'
+                        : p.popular
+                          ? 'ring-2 ring-primary/90 shadow-xl shadow-orange-500/10 z-10 bg-white/95'
+                          : 'border border-gray-200/80 bg-white/90'
                       }`}
                   >
                     {p.popular && (

@@ -24,13 +24,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenDemo }) => {
   }, []);
 
   const navLinks = [
-    { name: 'Product', path: '/product' },
-    { name: 'Use Cases', path: '/#use-cases' },
-    { name: 'Modules', path: '/#modules' },
-    { name: 'Pricing', path: '/#pricing' },
-    { name: 'Trust', path: '/#trust' },
-    { name: 'Resources', path: '/resources' },
+    { name: 'Problem', path: '/', sectionId: 'problem', type: 'section' as const },
+    { name: 'Use Cases', path: '/', sectionId: 'use-cases', type: 'section' as const },
+    { name: 'Modules', path: '/', sectionId: 'modules', type: 'section' as const },
+    { name: 'Works', path: '/', sectionId: 'how-it-works', type: 'section' as const },
+    { name: 'Outcomes', path: '/', sectionId: 'outcomes', type: 'section' as const },
+    { name: 'Pricing', path: '/', sectionId: 'pricing', type: 'section' as const },
   ];
+
+  const handleNavClick = (link: (typeof navLinks)[number]) => {
+    setIsMobileMenuOpen(false);
+    if (link.type === 'section' && link.sectionId) {
+      setTimeout(() => {
+        document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   return (
     <header
@@ -57,13 +66,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenDemo }) => {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.path.startsWith('/#') ? link.path.substring(1) : `#${link.path}`}
+                to={link.type === 'section' ? { pathname: '/', state: { scrollTo: link.sectionId } } : link.path}
+                onClick={() => handleNavClick(link)}
                 className="text-sm font-medium text-slate hover:text-primary transition-all duration-200 nav-link-animated"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -91,14 +101,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenDemo }) => {
       >
         <Container className="flex flex-col gap-6">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.name}
-              href={link.path.startsWith('/#') ? link.path.substring(1) : `#${link.path}`}
+              to={link.type === 'section' ? { pathname: '/', state: { scrollTo: link.sectionId } } : link.path}
+              onClick={() => handleNavClick(link)}
               className="text-lg font-semibold text-graphite border-b border-gray-50 pb-4 hover:text-primary transition-colors duration-200 nav-link-animated"
-              onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
           <Button onClick={() => { onOpenDemo(); setIsMobileMenuOpen(false); }} fullWidth>
             Get a Demo

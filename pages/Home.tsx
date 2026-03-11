@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useInView, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -440,10 +441,20 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
+  const location = useLocation();
   const [hoveredModule, setHoveredModule] = useState<number | null>(null);
   const [activeOutcomeFilter, setActiveOutcomeFilter] = useState<string | null>(null);
   const [activeUseCase, setActiveUseCase] = useState<keyof typeof useCaseContent>('Founders');
   const [selectedPricing, setSelectedPricing] = useState<number | null>(null);
+
+  // Scroll to section when navigating from nav (e.g. Use Cases, Modules, Pricing)
+  useEffect(() => {
+    const state = location.state as { scrollTo?: string } | null;
+    if (state?.scrollTo) {
+      const el = document.getElementById(state.scrollTo);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [location.state]);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
@@ -672,8 +683,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                         <h4 className="text-xs font-bold text-primary uppercase">Confidence</h4>
                         <motion.span
                           initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          viewport={{ once: true }}
+                          animate={{ opacity: 1 }}
                           className="text-xl font-bold text-graphite"
                         >
                           82%
@@ -682,8 +692,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                       <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
-                          whileInView={{ width: '82%' }}
-                          viewport={{ once: true }}
+                          animate={{ width: '82%' }}
                           transition={{ duration: 1.5, ease: "easeOut" }}
                           className="h-full bg-gradient-to-r from-orange-400 to-primary rounded-full relative"
                         >
@@ -704,8 +713,8 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                           <motion.li
                             key={i}
                             initial={{ opacity: 0, x: -10 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.5 + (i * 0.1) }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5 + (i * 0.1), duration: 0.4, ease: 'easeOut' }}
                             className="flex items-start gap-3 text-sm text-slate"
                           >
                             <div className="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center shrink-0 mt-0.5">
@@ -725,7 +734,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
       </Section>
 
       {/* --- SECTION 2: THE PROBLEM --- */}
-      <Section background="white" gradientBorder="bottom" className="relative overflow-hidden">
+      <Section id="problem" background="white" gradientBorder="bottom" className="relative overflow-hidden">
         {/* Signal Noise Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           {[...Array(12)].map((_, i) => (
@@ -840,7 +849,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
       </Section>
 
       {/* --- Section 4: How it works --- */}
-      <Section className="relative overflow-hidden py-20 md:py-32">
+      <Section id="how-it-works" className="relative overflow-hidden py-20 md:py-32">
         {/* Prominent soft peach/orange gradient background */}
         <div className="absolute inset-0 bg-gradient-mesh opacity-60" />
 
@@ -1318,7 +1327,7 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
       </Section>
 
       {/* --- SECTION 7: OUTCOMES --- */}
-      <Section gradientBorder="top">
+      <Section id="outcomes" gradientBorder="top">
         <Container>
           <motion.div
             initial="hidden"
@@ -1461,16 +1470,16 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                   variants={fadeInUp}
                   onClick={() => setSelectedPricing(prev => prev === i ? null : i)}
                   className={`group/card h-full transition-all duration-300 ease-out cursor-pointer ${p.popular ? 'lg:-mt-2 lg:mb-2' : ''} ${isDimmed ? 'opacity-75 scale-[0.98]' : ''}`}
-                  whileHover={{ y: p.popular ? -4 : -2, transition: { duration: 0.25 } }}
+                  whileHover={{ y: isSelected || p.popular ? -4 : -2, transition: { duration: 0.25 } }}
                 >
                   <AnimatedCard
                     noHover
                     className={`flex flex-col relative h-full overflow-visible transition-all duration-300 ease-out
                       ${isSelected
-                        ? 'ring-2 ring-primary shadow-xl shadow-orange-500/15 scale-[1.02] bg-white'
+                        ? 'ring-2 ring-primary ring-offset-2 shadow-xl shadow-orange-500/15 scale-[1.02] bg-white border-primary/30'
                         : p.popular
-                          ? 'ring-2 ring-primary/90 shadow-xl shadow-orange-500/10 z-10 bg-white/95'
-                          : 'border border-gray-200/80 bg-white/90'
+                          ? 'ring-2 ring-orange-200/80 shadow-lg shadow-orange-500/5 z-10 bg-white/95 border border-gray-200/80'
+                          : 'border-2 border-gray-200/80 bg-white/90 hover:border-orange-200/60'
                       }`}
                   >
                     {p.popular && (
@@ -1493,14 +1502,14 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
                     </div>
 
                     <div className="mb-6 pb-6 border-b border-gray-100">
-                      <span className={`text-3xl lg:text-4xl font-bold font-display tracking-tight ${p.popular ? 'text-gradient-primary' : 'text-graphite'}`}>{price}</span>
+                      <span className={`text-3xl lg:text-4xl font-bold font-display tracking-tight transition-colors duration-300 ${isSelected ? 'text-gradient-primary' : 'text-graphite'}`}>{price}</span>
                       <span className="text-slate text-sm font-medium ml-0.5">{period}</span>
                     </div>
 
                     <ul className="space-y-4 mb-8 flex-grow">
                       {features.map((feat, idx) => (
                         <li key={idx} className="flex items-start gap-3 text-sm text-slate transition-colors duration-200 group-hover/card:text-graphite">
-                          <CheckCircle2 size={18} className={`mt-0.5 shrink-0 transition-colors duration-200 ${p.popular ? 'text-primary' : 'text-slate-400 group-hover/card:text-primary/70'}`} />
+                          <CheckCircle2 size={18} className={`mt-0.5 shrink-0 transition-colors duration-300 ${isSelected ? 'text-primary' : 'text-slate-400 group-hover/card:text-primary/70'}`} />
                           <span className="leading-snug">{feat}</span>
                         </li>
                       ))}
@@ -1508,9 +1517,9 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo, onOpenExample }) => {
 
                     <div className="mt-auto">
                       <Button
-                        variant={p.popular ? 'primary' : 'secondary'}
+                        variant={isSelected ? 'primary' : 'secondary'}
                         fullWidth
-                        className={`transition-all duration-300 ${!p.popular ? '!border-gray-200 hover:!border-primary/40 hover:!bg-orange-50/30' : 'shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/25'}`}
+                        className={`transition-all duration-300 ${isSelected ? 'shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/25' : '!border-gray-200 hover:!border-primary/40 hover:!bg-orange-50/30'}`}
                       >
                         {i === 3 ? 'Contact Sales' : 'Start Trial'}
                       </Button>
